@@ -1,0 +1,201 @@
+﻿@page "/SampleData"
+@inject ICategoryData categoryData
+@inject IStatusData statusData
+@inject IUserData userData
+@inject ISuggestionData suggestionData
+
+<h3>Sample Data</h3>
+
+@if (categoriesCreated)
+{
+    <h4>Categories have beed created</h4>
+}
+else
+{
+    <button class="btn btn-primary" @onclick="CreateCategories">Create Categories</button>
+}
+
+
+@if (statusesCreated)
+{
+    <h4>Statuses have beed created</h4>
+}
+else
+{
+    <button class="btn btn-primary" @onclick="CreateStatuses">Create Statuses</button>
+}
+
+<button class="btn btn-danger" @onclick="GenerateSampleData">Generate Sample Data</button>
+
+
+@code {
+    private bool categoriesCreated = false;
+    private bool statusesCreated = false;
+
+    private async Task GenerateSampleData()
+    {
+        UserModel user = new()
+            {
+                FirstName = "Titas",
+                LastName = " Nera",
+                EmailAddress = "dasd@adasd.com",
+                DisplayName = "Bukis",
+                ObjectIdentifier = "abs-111"
+            };
+        await userData.CreateUser(user);
+
+        var foundUser = await userData.GetUserFromAuthentification("abs-111");
+        var categories = await categoryData.GetAllCategories();
+        var statuses = await statusData.GetAllStatuses();
+
+        HashSet<string> votes = new();
+        votes.Add("1");
+        votes.Add("2");
+        votes.Add("3");
+
+
+        SuggestionModel suggestion = new()
+            {
+                Author = new BasicUserModel(foundUser),
+                Category = categories[0],
+                Suggestion = "First suggestion",
+                UserVotes = votes,
+                SuggestionStatus = statuses[1],
+                Description = "This created for Sample data"
+            };
+        await suggestionData.CreateSuggestion(suggestion);
+
+        suggestion = new()
+            {
+                Author = new BasicUserModel(foundUser),
+                Category = categories[1],
+                Suggestion = "Second suggestion",
+                Description = "This created for Sample data",
+                SuggestionStatus = statuses[2],
+                UserVotes = votes,
+                OwnerNotes = " this is note for the status"
+            };
+        await suggestionData.CreateSuggestion(suggestion);
+
+        suggestion = new()
+            {
+                Author = new BasicUserModel(foundUser),
+                Category = categories[2],
+                Suggestion = "Third suggestion",
+                Description = "This created for Sample data",
+                SuggestionStatus = statuses[3],
+                OwnerNotes = " this is note for the status"
+            };
+        await suggestionData.CreateSuggestion(suggestion);
+
+        suggestion = new()
+            {
+                Author = new BasicUserModel(foundUser),
+                Category = categories[3],
+                Suggestion = "Fourth suggestion",
+                Description = "This created for Sample data",
+                SuggestionStatus = statuses[1],
+                OwnerNotes = " this is note for the status"
+            };
+        await suggestionData.CreateSuggestion(suggestion);
+
+        votes.Add("4");
+
+        suggestion = new()
+            {
+                Author = new BasicUserModel(foundUser),
+                Category = categories[4],
+                Suggestion = "Fifth suggestion",
+                Description = "This created for Sample data",
+                SuggestionStatus = statuses[1],
+                OwnerNotes = " this is note for the status"
+            };
+        await suggestionData.CreateSuggestion(suggestion);
+    }
+
+    private async Task CreateCategories()
+    {
+        var categories = await categoryData.GetAllCategories();
+
+        if (categories?.Count>0)
+        {
+            return;
+        }
+
+        CategoryModel cat = new()
+            {
+                CategoryName = "Courses",
+                CategoryDescription = "Courses",
+            };
+        await categoryData.CreateCategory(cat);
+
+        cat = new()
+            {
+                CategoryName = "Dev Questions",
+                CategoryDescription = "Advice on being a developer",
+            };
+        await categoryData.CreateCategory(cat);
+
+        cat = new()
+            {
+                CategoryName = "Other",
+                CategoryDescription = "Other",
+            };
+        await categoryData.CreateCategory(cat);
+
+        cat = new()
+            {
+                CategoryName = "Simple ",
+                CategoryDescription = "Other",
+            };
+        await categoryData.CreateCategory(cat);
+
+        cat = new()
+            {
+                CategoryName = "Work",
+                CategoryDescription = "Other",
+            };
+        await categoryData.CreateCategory(cat);
+
+        categoriesCreated = true;
+    }
+
+    private async Task CreateStatuses()
+    {
+        var statuses = await statusData.GetAllStatuses();
+
+        if (statuses?.Count > 0)
+        {
+            return;
+        }
+        StatusModel stat = new()
+            {
+                StatusName = "Completed",
+                StatusDescription = "Suggestion accepted and Created"
+            };
+        await statusData.CreateStatuses(stat);
+
+        stat = new()
+            {
+                StatusName = "Watching",
+                StatusDescription = "Suggestion Watching"
+            };
+        await statusData.CreateStatuses(stat);
+
+        stat = new()
+            {
+                StatusName = "Upcoming",
+                StatusDescription = "Suggestion Upcoming"
+            };
+        await statusData.CreateStatuses(stat);
+
+        stat = new()
+            {
+                StatusName = "Dismissed",
+                StatusDescription = "Suggestion was Dismissed"
+            };
+        await statusData.CreateStatuses(stat);
+
+        statusesCreated = true;
+    }
+}

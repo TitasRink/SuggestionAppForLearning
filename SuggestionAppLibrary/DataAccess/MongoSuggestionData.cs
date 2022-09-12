@@ -8,7 +8,7 @@ public class MongoSuggestionData : ISuggestionData
 	private readonly IMemoryCache _cache;
 	private readonly IUserData _userData;
 	private readonly IMongoCollection<SuggestionModel> _suggestions;
-	private const string CacheName = "StatusData";
+	private const string CacheName = "SuggestionData";
 
 	public MongoSuggestionData(IDbConnection db, IMemoryCache cache, IUserData userData)
 	{
@@ -21,6 +21,7 @@ public class MongoSuggestionData : ISuggestionData
 	public async Task<List<SuggestionModel>> GetAllSuggestions()
 	{
 		var output = _cache.Get<List<SuggestionModel>>(CacheName);
+		
 		if (output is null)
 		{
 			var result = await _suggestions.FindAsync(x => x.Archived == false);
